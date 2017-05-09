@@ -1,0 +1,76 @@
+// This file provides basic support for building the TensorFlow demo
+// in Android Studio with Gradle.
+//
+// Note that Bazel is still used by default to compile the native libs,
+// and should be installed at the location noted below. This build file
+// automates the process of calling out to it and copying the compiled
+// libraries back into the appropriate directory.
+//
+// Alternatively, experimental support for Makefile builds is provided by
+// setting buildWithMake below to true. This will allow building the demo
+// on Windows machines, but note that full equivalence with the Bazel
+// build is not yet guaranteed. See comments below for caveats and tips
+// for speeding up the build, such as as enabling ccache.
+
+
+project.buildDir = 'gradleBuild'
+getProject().setBuildDir('gradleBuild')
+
+project.ext.ASSET_DIR = projectDir.toString() + '/assets'
+project.ext.TMP_DIR   = project.buildDir.toString() + '/downloads'
+
+assert file(project.ext.ASSET_DIR + "/rounded_graph.pb").exists()
+assert file(project.ext.ASSET_DIR + "/retrained_labels.txt").exists()
+assert file(projectDir.toString()+"/libs/tensorflow.aar").exists()
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'de.undercouch:gradle-download-task:3.2.0'
+    }
+}
+
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "25.0.1"
+
+    lintOptions {
+        abortOnError false
+    }
+
+    sourceSets {
+        main {
+            // Android demo app sources.
+            java {
+                srcDir 'src'
+            }
+
+            manifest.srcFile 'AndroidManifest.xml'
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = [project.ext.ASSET_DIR]
+
+            repositories {
+                flatDir {
+                    dirs 'libs'
+                }
+            }
+
+            dependencies {
+                compile(name: 'tensorflow', ext: 'aar')
+            }
+        }
+
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+}
