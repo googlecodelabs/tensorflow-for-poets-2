@@ -13,21 +13,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import os
 
 import sys
 import argparse
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 import PIL.Image as Image
 import tensorflow as tf 
 
-import app.scripts.retrain as retrain
-from app.scripts.count_ops import load_graph
+import scripts.retrain as retrain
+from scripts.count_ops import load_graph
 
 def evaluate_graph(graph_file_name):
     with load_graph(graph_file_name).as_default() as graph:
