@@ -1,9 +1,11 @@
 # Overview
 
-This repo contains a `git subtree split` of the `tensorflow/examples/android`
-directory from the main tensorflow repo, in the `android/` directory.
+This repo contains code for the
+["TensorFlow for poets 2" codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets-2).
 
-The `scripts` directory contains helpers for the codelab. 
+This repo contains a simplified and trimmed down version of tensorflow's
+[android image classification example](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android)
+in the `android/` directory.
 
-
+The `scripts` directory contains helpers for the codelab.
 
