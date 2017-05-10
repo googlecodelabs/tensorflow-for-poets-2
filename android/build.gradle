@@ -17,11 +17,9 @@ project.buildDir = 'gradleBuild'
 getProject().setBuildDir('gradleBuild')
 
 project.ext.ASSET_DIR = projectDir.toString() + '/assets'
-project.ext.TMP_DIR   = project.buildDir.toString() + '/downloads'
 
 assert file(project.ext.ASSET_DIR + "/rounded_graph.pb").exists()
 assert file(project.ext.ASSET_DIR + "/retrained_labels.txt").exists()
-assert file(projectDir.toString()+"/libs/tensorflow.aar").exists()
 
 buildscript {
     repositories {
@@ -30,7 +28,6 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.1'
-        classpath 'de.undercouch:gradle-download-task:3.2.0'
     }
 }
 
@@ -38,8 +35,8 @@ buildscript {
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     lintOptions {
         abortOnError false
@@ -60,17 +57,17 @@ android {
             assets.srcDirs = [project.ext.ASSET_DIR]
 
             repositories {
-                flatDir {
-                    dirs 'libs'
-                }
+                jcenter()
             }
 
             dependencies {
-                compile(name: 'tensorflow', ext: 'aar')
+                compile 'org.tensorflow:tensorflow-android:1.2.0-preview'
             }
+
         }
 
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
 }
+
