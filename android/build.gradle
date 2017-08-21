@@ -18,8 +18,8 @@ getProject().setBuildDir('gradleBuild')
 
 project.ext.ASSET_DIR = projectDir.toString() + '/assets'
 
-assert file(project.ext.ASSET_DIR + "/rounded_graph.pb").exists()
-assert file(project.ext.ASSET_DIR + "/retrained_labels.txt").exists()
+assert file(project.ext.ASSET_DIR + "/graph.pb").exists()
+assert file(project.ext.ASSET_DIR + "/labels.txt").exists()
 
 buildscript {
     repositories {
@@ -27,7 +27,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta2'
     }
 }
 

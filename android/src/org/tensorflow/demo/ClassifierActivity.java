@@ -58,14 +58,23 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
   // --input_node_names="Mul" \
   // --output_node_names="final_result" \
   // --input_binary=true
+
+  /* Inception V3
   private static final int INPUT_SIZE = 299;
   private static final int IMAGE_MEAN = 128;
   private static final float IMAGE_STD = 128.0f;
   private static final String INPUT_NAME = "Mul:0";
   private static final String OUTPUT_NAME = "final_result";
+  */
 
-  private static final String MODEL_FILE = "file:///android_asset/rounded_graph.pb";
-  private static final String LABEL_FILE = "file:///android_asset/retrained_labels.txt";
+  private static final int INPUT_SIZE = 224;
+  private static final int IMAGE_MEAN = 128;
+  private static final float IMAGE_STD = 128.0f;
+  private static final String INPUT_NAME = "input";
+  private static final String OUTPUT_NAME = "MobilenetV1/Predictions/Softmax";
+
+  private static final String MODEL_FILE = "file:///android_asset/graph.pb";
+  private static final String LABEL_FILE = "file:///android_asset/labels.txt";
 
   private static final boolean SAVE_PREVIEW_BITMAP = false;
 
