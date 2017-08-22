@@ -34,7 +34,7 @@ def evaluate_graph(graph_file_name):
         ground_truth_input = tf.placeholder(
             tf.float32, [None, 5], name='GroundTruthInput')
         
-        image_buffer_input = graph.get_tensor_by_name('Cast:0')
+        image_buffer_input = graph.get_tensor_by_name('input:0')
         final_tensor = graph.get_tensor_by_name('final_result:0')
         accuracy, _ = retrain.add_evaluation_step(final_tensor, ground_truth_input)
         
@@ -70,9 +70,10 @@ def evaluate_graph(graph_file_name):
     xents = []
     with tf.Session(graph=graph) as sess:
         for filename, ground_truth in zip(filenames, ground_truths):    
-            image = Image.open(filename)
-            image = np.array(image, dtype=np.float32)
-    
+            image = Image.open(filename).resize((224,224),Image.ANTIALIAS)
+            image = np.array(image, dtype=np.float32)[None,...]
+            image = (image-128)/128.0
+
             feed_dict={
                 image_buffer_input: image,
                 ground_truth_input: ground_truth}
