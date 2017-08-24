@@ -67,16 +67,15 @@ def load_labels(label_file):
   return label
 
 if __name__ == "__main__":
-  file_name = "tensorflow/examples/label_image/data/grace_hopper.jpg"
-  model_file = \
-    "tensorflow/examples/label_image/data/inception_v3_2016_08_28_frozen.pb"
-  label_file = "tensorflow/examples/label_image/data/imagenet_slim_labels.txt"
-  input_height = 299
-  input_width = 299
-  input_mean = 0
-  input_std = 255
+  file_name = "tf_files/flower_photos/daisy/3475870145_685a19116d.jpg"
+  model_file = "tf_files/retrained_graph.pb"
+  label_file = "tf_files/retrained_labels.txt"
+  input_height = 224
+  input_width = 224
+  input_mean = 128
+  input_std = 128
   input_layer = "input"
-  output_layer = "InceptionV3/Predictions/Reshape_1"
+  output_layer = "final_result"
 
   parser = argparse.ArgumentParser()
   parser.add_argument("--image", help="image to be processed")
