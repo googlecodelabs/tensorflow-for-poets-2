@@ -177,6 +177,10 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
   public void onImageAvailable(final ImageReader reader) {
     Image image = null;
 
+    final int yRowStride;
+    final int uvRowStride;
+    final int uvPixelStride;
+
     try {
       image = reader.acquireLatestImage();
 
@@ -195,19 +199,9 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
       final Plane[] planes = image.getPlanes();
       fillBytes(planes, yuvBytes);
 
-      final int yRowStride = planes[0].getRowStride();
-      final int uvRowStride = planes[1].getRowStride();
-      final int uvPixelStride = planes[1].getPixelStride();
-      ImageUtils.convertYUV420ToARGB8888(
-          yuvBytes[0],
-          yuvBytes[1],
-          yuvBytes[2],
-          previewWidth,
-          previewHeight,
-          yRowStride,
-          uvRowStride,
-          uvPixelStride,
-          rgbBytes);
+      yRowStride = planes[0].getRowStride();
+      uvRowStride = planes[1].getRowStride();
+      uvPixelStride = planes[1].getPixelStride();
 
       image.close();
     } catch (final Exception e) {
@@ -219,19 +213,30 @@ public class ClassifierActivity extends CameraActivity implements OnImageAvailab
       return;
     }
 
-    rgbFrameBitmap.setPixels(rgbBytes, 0, previewWidth, 0, 0, previewWidth, previewHeight);
-    final Canvas canvas = new Canvas(croppedBitmap);
-    canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
-
-    // For examining the actual TF input.
-    if (SAVE_PREVIEW_BITMAP) {
-      ImageUtils.saveBitmap(croppedBitmap);
-    }
-
     runInBackground(
         new Runnable() {
           @Override
           public void run() {
+            ImageUtils.convertYUV420ToARGB8888(
+                    yuvBytes[0],
+                    yuvBytes[1],
+                    yuvBytes[2],
+                    previewWidth,
+                    previewHeight,
+                    yRowStride,
+                    uvRowStride,
+                    uvPixelStride,
+                    rgbBytes);
+
+            rgbFrameBitmap.setPixels(rgbBytes, 0, previewWidth, 0, 0, previewWidth, previewHeight);
+            final Canvas canvas = new Canvas(croppedBitmap);
+            canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
+
+            // For examining the actual TF input.
+            if (SAVE_PREVIEW_BITMAP) {
+              ImageUtils.saveBitmap(croppedBitmap);
+            }
+
             final long startTime = SystemClock.uptimeMillis();
             final List<Classifier.Recognition> results = classifier.recognizeImage(croppedBitmap);
             lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
