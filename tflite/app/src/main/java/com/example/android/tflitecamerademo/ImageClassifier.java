@@ -43,7 +43,7 @@ public class ImageClassifier {
   private static final String TAG = "TfLiteCameraDemo";
 
   /** Name of the model file stored in Assets. */
-  private static final String MODEL_PATH = "mobilenet_quant_v1_224.tflite";
+  private static final String MODEL_PATH = "graph.tflite";
 
   /** Name of the label file stored in Assets. */
   private static final String LABEL_PATH = "labels.txt";
