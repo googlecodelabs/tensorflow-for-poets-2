@@ -43,7 +43,7 @@ public class ImageClassifier {
   private static final String TAG = "TfLiteCameraDemo";
 
   /** Name of the model file stored in Assets. */
-  private static final String MODEL_PATH = "graph.tflite";
+  private static final String MODEL_PATH = "graph.lite";
 
   /** Name of the label file stored in Assets. */
   private static final String LABEL_PATH = "labels.txt";
@@ -59,6 +59,10 @@ public class ImageClassifier {
   static final int DIM_IMG_SIZE_X = 224;
   static final int DIM_IMG_SIZE_Y = 224;
 
+  private static final int IMAGE_MEAN = 128;
+  private static final float IMAGE_STD = 128.0f;
+
+
   /* Preallocated buffers for storing image data in. */
   private int[] intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
 
@@ -72,7 +76,7 @@ public class ImageClassifier {
   private ByteBuffer imgData = null;
 
   /** An array to hold inference results, to be feed into Tensorflow Lite as outputs. */
-  private byte[][] labelProbArray = null;
+  private float[][] labelProbArray = null;
 
   private PriorityQueue<Map.Entry<String, Float>> sortedLabels =
       new PriorityQueue<>(
@@ -90,9 +94,9 @@ public class ImageClassifier {
     labelList = loadLabelList(activity);
     imgData =
         ByteBuffer.allocateDirect(
-            DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
+            4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
     imgData.order(ByteOrder.nativeOrder());
-    labelProbArray = new byte[1][labelList.size()];
+    labelProbArray = new float[1][labelList.size()];
     Log.d(TAG, "Created a Tensorflow Lite Image Classifier.");
   }
 
@@ -155,9 +159,9 @@ public class ImageClassifier {
     for (int i = 0; i < DIM_IMG_SIZE_X; ++i) {
       for (int j = 0; j < DIM_IMG_SIZE_Y; ++j) {
         final int val = intValues[pixel++];
-        imgData.put((byte) ((val >> 16) & 0xFF));
-        imgData.put((byte) ((val >> 8) & 0xFF));
-        imgData.put((byte) (val & 0xFF));
+        imgData.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+        imgData.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+        imgData.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
       }
     }
     long endTime = SystemClock.uptimeMillis();
@@ -168,7 +172,7 @@ public class ImageClassifier {
   private String printTopKLabels() {
     for (int i = 0; i < labelList.size(); ++i) {
       sortedLabels.add(
-          new AbstractMap.SimpleEntry<>(labelList.get(i), (labelProbArray[0][i] & 0xff) / 255.0f));
+          new AbstractMap.SimpleEntry<>(labelList.get(i), labelProbArray[0][i]));
       if (sortedLabels.size() > RESULTS_TO_SHOW) {
         sortedLabels.poll();
       }
