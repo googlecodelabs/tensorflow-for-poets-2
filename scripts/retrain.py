@@ -95,6 +95,7 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+import collections
 from datetime import datetime
 import hashlib
 import os.path
@@ -140,14 +141,13 @@ def create_image_lists(image_dir, testing_percentage, validation_percentage):
   if not gfile.Exists(image_dir):
     tf.logging.error("Image directory '" + image_dir + "' not found.")
     return None
-  result = {}
-  sub_dirs = [x[0] for x in gfile.Walk(image_dir)]
-  # The root directory comes first, so skip it.
-  is_root_dir = True
+  result = collections.OrderedDict()
+  sub_dirs = [
+    os.path.join(image_dir,item)
+    for item in gfile.ListDirectory(image_dir)]
+  sub_dirs = sorted(item for item in sub_dirs
+                    if gfile.IsDirectory(item))
   for sub_dir in sub_dirs:
-    if is_root_dir:
-      is_root_dir = False
-      continue
     extensions = ['jpg', 'jpeg', 'JPG', 'JPEG']
     file_list = []
     dir_name = os.path.basename(sub_dir)
