@@ -19,6 +19,7 @@ from __future__ import print_function
 
 import argparse
 import sys
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -121,11 +122,16 @@ if __name__ == "__main__":
   output_operation = graph.get_operation_by_name(output_name);
 
   with tf.Session(graph=graph) as sess:
+    start = time.time()
     results = sess.run(output_operation.outputs[0],
                       {input_operation.outputs[0]: t})
+    end=time.time()
   results = np.squeeze(results)
 
   top_k = results.argsort()[-5:][::-1]
   labels = load_labels(label_file)
+
+  print('\nEvaluation time (1-image): {:.3f}s\n'.format(end-start))
+
   for i in top_k:
     print(labels[i], results[i])
