@@ -14,7 +14,7 @@ of the tensorflow libraries you plan on using:
 This repo contains simplified and trimmed down version of tensorflow's example image classification apps.
 
 * The TensorFlow Lite version, in `android/tflite`, comes from [tensorflow/contrib/lite](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/lite).
-* The Tensorflow Mobile version, in `android/tfmobile`, comes from [`tensorflow/examples/android/`](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android)
+* The Tensorflow Mobile version, in `android/tfmobile`, comes from [tensorflow/examples/android/](https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android)
 
 The `scripts` directory contains helpers for the codelab. Some of these come from the main TensorFlow repository, and are included here so you can use them without also downloading the main TensorFlow repo (they are not part of the TensorFlow `pip` installation).
 
