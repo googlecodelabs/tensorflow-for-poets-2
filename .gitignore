@@ -5,6 +5,6 @@ tf_files
 gradle*
 libs/
 local.properties
-android.iml
+*.iml
 .gradle/
 android/assets/*
