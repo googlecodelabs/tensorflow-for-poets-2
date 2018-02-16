@@ -18,8 +18,8 @@ getProject().setBuildDir('gradleBuild')
 
 project.ext.ASSET_DIR = projectDir.toString() + '/assets'
 
-assert file(project.ext.ASSET_DIR + "/graph.pb").exists()
-assert file(project.ext.ASSET_DIR + "/labels.txt").exists()
+assert file(project.ext.ASSET_DIR + "/mobilenet_v3.pb").exists()
+assert file(project.ext.ASSET_DIR + "/output_labels.txt").exists()
 
 buildscript {
     repositories {
@@ -28,7 +28,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
     }
 }
 
@@ -36,8 +36,8 @@ buildscript {
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     lintOptions {
         abortOnError false
@@ -62,7 +62,7 @@ android {
             }
 
             dependencies {
-                compile 'org.tensorflow:tensorflow-android:1.2.0-preview'
+                compile 'org.tensorflow:tensorflow-android:1.2.0'
             }
 
         }
