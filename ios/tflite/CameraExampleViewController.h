@@ -14,23 +14,28 @@
 
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
+#import <Photos/Photos.h>
 
 #include <vector>
 
 #include "tensorflow/contrib/lite/kernels/register.h"
 #include "tensorflow/contrib/lite/model.h"
 
+typedef struct {
+  int width;
+  int height;
+  int channels;
+  std::vector<uint8_t> data;
+} image_data;
+
+
 @interface CameraExampleViewController
     : UIViewController<UIGestureRecognizerDelegate, AVCaptureVideoDataOutputSampleBufferDelegate> {
   IBOutlet UIView* previewView;
-  AVCaptureVideoPreviewLayer* previewLayer;
-  AVCaptureVideoDataOutput* videoDataOutput;
-  dispatch_queue_t videoDataOutputQueue;
+  CALayer* previewLayer;
   UIView* flashView;
-  BOOL isUsingFrontFacingCamera;
-  NSMutableDictionary* oldPredictionValues;
   NSMutableArray* labelLayers;
-  AVCaptureSession* session;
+
 
   std::vector<std::string> labels;
   std::unique_ptr<tflite::FlatBufferModel> model;
@@ -39,10 +44,15 @@
 
   double total_latency;
   int total_count;
+        
+  int photos_index;
+  PHFetchResult *photos;
+  
+  UIImage* input_image;
+  UIImage* display_image;
 }
 @property(strong, nonatomic) CATextLayer* predictionTextLayer;
 
 - (IBAction)takePicture:(id)sender;
-- (IBAction)switchCameras:(id)sender;
-
 @end
+

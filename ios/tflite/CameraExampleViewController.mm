@@ -32,8 +32,8 @@
 
 // If you have your own model, modify this to the file name, and make sure
 // you've added the file to your app resources too.
-static NSString* model_file_name = @"mobilenet_quant_v1_224";
-static NSString* model_file_type = @"tflite";
+static NSString* model_file_name = @"graph";
+static NSString* model_file_type = @"lite";
 
 // If you have your own model, point this to the labels file.
 static NSString* labels_file_name = @"labels";
@@ -65,14 +65,16 @@ static void LoadLabels(NSString* file_name, NSString* file_type,
   std::string line;
   while (t) {
     std::getline(t, line);
-    label_strings->push_back(line);
+    if (line.length()){
+      label_strings->push_back(line);
+    }
   }
   t.close();
 }
 
 // Returns the top N confidence values over threshold in the provided vector,
 // sorted by confidence in descending order.
-static void GetTopN(const uint8_t* prediction, const int prediction_size, const int num_results,
+static void GetTopN(const float* prediction, const int prediction_size, const int num_results,
                     const float threshold, std::vector<std::pair<float, int>>* top_results) {
   // Will contain top N results in ascending order.
   std::priority_queue<std::pair<float, int>, std::vector<std::pair<float, int>>,
@@ -81,7 +83,7 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
 
   const long count = prediction_size;
   for (int i = 0; i < count; ++i) {
-    const float value = prediction[i] / 255.0;
+    const float value = prediction[i];
     // Only add it if it beats the threshold and has a chance at being in
     // the top N.
     if (value < threshold) {
@@ -105,70 +107,107 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
 }
 
 @interface CameraExampleViewController (InternalMethods)
-- (void)setupAVCapture;
 - (void)teardownAVCapture;
 @end
 
 @implementation CameraExampleViewController
 
-- (void)setupAVCapture {
-  NSError* error = nil;
-
-  session = [AVCaptureSession new];
-  if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-    [session setSessionPreset:AVCaptureSessionPreset640x480];
-  else
-    [session setSessionPreset:AVCaptureSessionPresetPhoto];
-
-  AVCaptureDevice* device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-  AVCaptureDeviceInput* deviceInput =
-      [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-
-  if (error != nil) {
-    NSLog(@"Failed to initialize AVCaptureDeviceInput. Note: This app doesn't work with simulator");
-    assert(NO);
-  }
-
-  if ([session canAddInput:deviceInput]) [session addInput:deviceInput];
-
-  videoDataOutput = [AVCaptureVideoDataOutput new];
-
-  NSDictionary* rgbOutputSettings =
-      [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCMPixelFormat_32BGRA]
-                                  forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-  [videoDataOutput setVideoSettings:rgbOutputSettings];
-  [videoDataOutput setAlwaysDiscardsLateVideoFrames:YES];
-  videoDataOutputQueue = dispatch_queue_create("VideoDataOutputQueue", DISPATCH_QUEUE_SERIAL);
-  [videoDataOutput setSampleBufferDelegate:self queue:videoDataOutputQueue];
-
-  if ([session canAddOutput:videoDataOutput]) [session addOutput:videoDataOutput];
-  [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
-
-  previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:session];
+- (void) attachPreviewLayer{
+  photos_index = 0;
+  photos = nil;
+  previewLayer = [[CALayer alloc] init];
+  
   [previewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
-  [previewLayer setVideoGravity:AVLayerVideoGravityResizeAspect];
   CALayer* rootLayer = [previewView layer];
   [rootLayer setMasksToBounds:YES];
   [previewLayer setFrame:[rootLayer bounds]];
   [rootLayer addSublayer:previewLayer];
-  [session startRunning];
+  
+  [self UpdatePhoto];
+}
 
-  if (error) {
-    NSString* title = [NSString stringWithFormat:@"Failed with error %d", (int)[error code]];
-    UIAlertController* alertController =
-        [UIAlertController alertControllerWithTitle:title
-                                            message:[error localizedDescription]
-                                     preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction* dismiss =
-        [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil];
-    [alertController addAction:dismiss];
-    [self presentViewController:alertController animated:YES completion:nil];
-    [self teardownAVCapture];
+- (void)UpdatePhoto{
+  PHAsset* asset;
+  if (photos==nil || photos_index >= photos.count){
+    [self updatePhotosLibrary];
+    photos_index=0;
   }
+  if (photos.count){
+    asset = photos[photos_index];
+    photos_index += 1;
+    input_image = [self convertImageFromAsset:asset
+                                   targetSize:CGSizeMake(wanted_input_width, wanted_input_height)
+                                         mode:PHImageContentModeAspectFill];
+    display_image = [self convertImageFromAsset:asset
+                                     targetSize:CGSizeMake(asset.pixelWidth,asset.pixelHeight)
+                                           mode:PHImageContentModeAspectFit];
+    [self DrawImage];
+  }
+  
+  if (input_image != nil){
+    image_data image = [self CGImageToPixels:input_image.CGImage];
+    [self runModelSimple:image];
+  }
+}
+
+- (void)DrawImage{
+  CGFloat view_height = 800;
+  CGFloat view_width = 600;
+  
+  UIGraphicsBeginImageContextWithOptions(CGSizeMake(view_width, view_height), NO, 0.0);
+  CGContextRef context = UIGraphicsGetCurrentContext();
+  UIGraphicsPushContext(context);
+  
+  float scale = view_width/display_image.size.width;
+  
+  if (display_image.size.height*scale > view_height){
+    scale = view_height/display_image.size.height;
+  }
+  
+  CGPoint origin = CGPointMake((view_width - display_image.size.width*scale) / 2.0f,
+                               (view_height - display_image.size.height*scale) / 2.0f);
+  [display_image drawInRect:CGRectMake(origin.x, origin.y,
+                                       display_image.size.width*scale,
+                                       display_image.size.height*scale)];
+  UIGraphicsPopContext();
+  display_image = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  previewLayer.contents = (id) display_image.CGImage;
 }
 
 - (void)teardownAVCapture {
   [previewLayer removeFromSuperlayer];
+}
+
+- (void) updatePhotosLibrary{
+  PHFetchOptions *fetchOptions = [[PHFetchOptions alloc] init];
+  fetchOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+  photos = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:fetchOptions];
+}
+
+- (UIImage *) convertImageFromAsset:(PHAsset *)asset
+                         targetSize:(CGSize) targetSize
+                              mode:(PHImageContentMode) mode{
+  PHImageManager * manager = [[PHImageManager alloc] init];
+  PHImageRequestOptions * options = [[PHImageRequestOptions alloc] init];
+  NSMutableArray * images = [[NSMutableArray alloc] init];
+  NSMutableArray * infos = [[NSMutableArray alloc] init];
+  
+  options.synchronous = TRUE;
+      
+  [manager requestImageForAsset:asset
+                     targetSize:targetSize
+                    contentMode:mode
+                        options:options
+                  resultHandler:^(UIImage *image, NSDictionary *info){
+                                  [images addObject:image];
+                                  [infos addObject:info];
+                                }
+  ];
+  
+  UIImage *result = images[0];
+
+  return result;
 }
 
 - (AVCaptureVideoOrientation)avOrientationForDeviceOrientation:
@@ -181,91 +220,60 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
   return result;
 }
 
+- (image_data)CGImageToPixels:(CGImage *)image {
+  image_data result;
+  result.width = (int)CGImageGetWidth(image);
+  result.height = (int)CGImageGetHeight(image);
+  result.channels = 4;
+  
+  CGColorSpaceRef color_space = CGColorSpaceCreateDeviceRGB();
+  const int bytes_per_row = (result.width * result.channels);
+  const int bytes_in_image = (bytes_per_row * result.height);
+  result.data = std::vector<uint8_t>(bytes_in_image);
+  const int bits_per_component = 8;
+  
+  CGContextRef context =
+    CGBitmapContextCreate(result.data.data(), result.width, result.height, bits_per_component, bytes_per_row,
+                          color_space, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+  CGColorSpaceRelease(color_space);
+  CGContextDrawImage(context, CGRectMake(0, 0, result.width, result.height), image);
+  CGContextRelease(context);
+  
+  return result;
+}
+
+
+
 - (IBAction)takePicture:(id)sender {
-  if ([session isRunning]) {
-    [session stopRunning];
-    [sender setTitle:@"Continue" forState:UIControlStateNormal];
-
-    flashView = [[UIView alloc] initWithFrame:[previewView frame]];
-    [flashView setBackgroundColor:[UIColor whiteColor]];
-    [flashView setAlpha:0.f];
-    [[[self view] window] addSubview:flashView];
-
-    [UIView animateWithDuration:.2f
-        animations:^{
-          [flashView setAlpha:1.f];
-        }
-        completion:^(BOOL finished) {
-          [UIView animateWithDuration:.2f
-              animations:^{
-                [flashView setAlpha:0.f];
-              }
-              completion:^(BOOL finished) {
-                [flashView removeFromSuperview];
-                flashView = nil;
-              }];
-        }];
-
-  } else {
-    [session startRunning];
-    [sender setTitle:@"Freeze Frame" forState:UIControlStateNormal];
-  }
+    [self UpdatePhoto];
 }
 
-- (void)captureOutput:(AVCaptureOutput*)captureOutput
-    didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
-           fromConnection:(AVCaptureConnection*)connection {
-  CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
-  CFRetain(pixelBuffer);
-  [self runModelOnFrame:pixelBuffer];
-  CFRelease(pixelBuffer);
-}
-
-- (void)runModelOnFrame:(CVPixelBufferRef)pixelBuffer {
-  assert(pixelBuffer != NULL);
-
-  OSType sourcePixelFormat = CVPixelBufferGetPixelFormatType(pixelBuffer);
-  assert(sourcePixelFormat == kCVPixelFormatType_32ARGB ||
-         sourcePixelFormat == kCVPixelFormatType_32BGRA);
-
-  const int sourceRowBytes = (int)CVPixelBufferGetBytesPerRow(pixelBuffer);
-  const int image_width = (int)CVPixelBufferGetWidth(pixelBuffer);
-  const int fullHeight = (int)CVPixelBufferGetHeight(pixelBuffer);
-
-  CVPixelBufferLockFlags unlockFlags = kNilOptions;
-  CVPixelBufferLockBaseAddress(pixelBuffer, unlockFlags);
-
-  unsigned char* sourceBaseAddr = (unsigned char*)(CVPixelBufferGetBaseAddress(pixelBuffer));
-  int image_height;
-  unsigned char* sourceStartAddr;
-  if (fullHeight <= image_width) {
-    image_height = fullHeight;
-    sourceStartAddr = sourceBaseAddr;
-  } else {
-    image_height = image_width;
-    const int marginY = ((fullHeight - image_width) / 2);
-    sourceStartAddr = (sourceBaseAddr + (marginY * sourceRowBytes));
-  }
-  const int image_channels = 4;
-  assert(image_channels >= wanted_input_channels);
-  uint8_t* in = sourceStartAddr;
-
+- (void)runModelSimple:(image_data)image{
   int input = interpreter->inputs()[0];
-
-  uint8_t* out = interpreter->typed_tensor<uint8_t>(input);
+  
+  const float input_mean = 127.5f;
+  const float input_std = 127.5f;
+  assert(image.channels >= wanted_input_channels);
+  uint8_t* in = image.data.data();
+  float* out = interpreter->typed_tensor<float>(input);
   for (int y = 0; y < wanted_input_height; ++y) {
-    uint8_t* out_row = out + (y * wanted_input_width * wanted_input_channels);
+    const int in_y = (y * image.height) / wanted_input_height;
+    uint8_t* in_row = in + (in_y * image.width * image.channels);
+    float* out_row = out + (y * wanted_input_width * wanted_input_channels);
     for (int x = 0; x < wanted_input_width; ++x) {
-      const int in_x = (y * image_width) / wanted_input_width;
-      const int in_y = (x * image_height) / wanted_input_height;
-      uint8_t* in_pixel = in + (in_y * image_width * image_channels) + (in_x * image_channels);
-      uint8_t* out_pixel = out_row + (x * wanted_input_channels);
+      const int in_x = (x * image.width) / wanted_input_width;
+      uint8_t* in_pixel = in_row + (in_x * image.channels);
+      float* out_pixel = out_row + (x * wanted_input_channels);
       for (int c = 0; c < wanted_input_channels; ++c) {
-        out_pixel[c] = in_pixel[c];
+        out_pixel[c] = (in_pixel[c] - input_mean) / input_std;
       }
     }
   }
+  
+  [self _execModel];
+}
 
+- (void)_execModel {
   double startTimestamp = [[NSDate new] timeIntervalSince1970];
   if (interpreter->Invoke() != kTfLiteOk) {
     LOG(FATAL) << "Failed to invoke!";
@@ -274,32 +282,28 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
   total_latency += (endTimestamp - startTimestamp);
   total_count += 1;
   NSLog(@"Time: %.4lf, avg: %.4lf, count: %d", endTimestamp - startTimestamp,
-        total_latency / total_count, total_count);
+        total_latency / total_count,  total_count);
 
-  const int output_size = 1000;
+  const int output_size = (int)labels.size();
   const int kNumResults = 5;
   const float kThreshold = 0.1f;
 
   std::vector<std::pair<float, int>> top_results;
 
-  uint8_t* output = interpreter->typed_output_tensor<uint8_t>(0);
+  float* output = interpreter->typed_output_tensor<float>(0);
   GetTopN(output, output_size, kNumResults, kThreshold, &top_results);
-
-  NSMutableDictionary* newValues = [NSMutableDictionary dictionary];
+  
+  std::vector<std::pair<float, std::string>> newValues;
   for (const auto& result : top_results) {
-    const float confidence = result.first;
-    const int index = result.second;
-    NSString* labelObject = [NSString stringWithUTF8String:labels[index].c_str()];
-    NSNumber* valueObject = [NSNumber numberWithFloat:confidence];
-    [newValues setObject:valueObject forKey:labelObject];
+    std::pair<float, std::string> item;
+    item.first = result.first;
+    item.second = labels[result.second];
+    
+    newValues.push_back(item);
   }
   dispatch_async(dispatch_get_main_queue(), ^(void) {
     [self setPredictionValues:newValues];
   });
-
-  CVPixelBufferUnlockBaseAddress(pixelBuffer, unlockFlags);
-
-  CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
 }
 
 - (void)dealloc {
@@ -313,9 +317,8 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
 - (void)viewDidLoad {
   [super viewDidLoad];
   labelLayers = [[NSMutableArray alloc] init];
-  oldPredictionValues = [[NSMutableDictionary alloc] init];
 
-  NSString* graph_path = FilePathForResourceName(model_file_name, @"tflite");
+  NSString* graph_path = FilePathForResourceName(model_file_name, model_file_type);
   model = tflite::FlatBufferModel::BuildFromFile([graph_path UTF8String]);
   if (!model) {
     LOG(FATAL) << "Failed to mmap model " << graph_path;
@@ -335,7 +338,7 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
     LOG(FATAL) << "Failed to allocate tensors!";
   }
 
-  [self setupAVCapture];
+  [self attachPreviewLayer];
 }
 
 - (void)viewDidUnload {
@@ -366,47 +369,7 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
   return YES;
 }
 
-- (void)setPredictionValues:(NSDictionary*)newValues {
-  const float decayValue = 0.75f;
-  const float updateValue = 0.25f;
-  const float minimumThreshold = 0.01f;
-
-  NSMutableDictionary* decayedPredictionValues = [[NSMutableDictionary alloc] init];
-  for (NSString* label in oldPredictionValues) {
-    NSNumber* oldPredictionValueObject = [oldPredictionValues objectForKey:label];
-    const float oldPredictionValue = [oldPredictionValueObject floatValue];
-    const float decayedPredictionValue = (oldPredictionValue * decayValue);
-    if (decayedPredictionValue > minimumThreshold) {
-      NSNumber* decayedPredictionValueObject = [NSNumber numberWithFloat:decayedPredictionValue];
-      [decayedPredictionValues setObject:decayedPredictionValueObject forKey:label];
-    }
-  }
-  oldPredictionValues = decayedPredictionValues;
-
-  for (NSString* label in newValues) {
-    NSNumber* newPredictionValueObject = [newValues objectForKey:label];
-    NSNumber* oldPredictionValueObject = [oldPredictionValues objectForKey:label];
-    if (!oldPredictionValueObject) {
-      oldPredictionValueObject = [NSNumber numberWithFloat:0.0f];
-    }
-    const float newPredictionValue = [newPredictionValueObject floatValue];
-    const float oldPredictionValue = [oldPredictionValueObject floatValue];
-    const float updatedPredictionValue = (oldPredictionValue + (newPredictionValue * updateValue));
-    NSNumber* updatedPredictionValueObject = [NSNumber numberWithFloat:updatedPredictionValue];
-    [oldPredictionValues setObject:updatedPredictionValueObject forKey:label];
-  }
-  NSArray* candidateLabels = [NSMutableArray array];
-  for (NSString* label in oldPredictionValues) {
-    NSNumber* oldPredictionValueObject = [oldPredictionValues objectForKey:label];
-    const float oldPredictionValue = [oldPredictionValueObject floatValue];
-    if (oldPredictionValue > 0.05f) {
-      NSDictionary* entry = @{@"label" : label, @"value" : oldPredictionValueObject};
-      candidateLabels = [candidateLabels arrayByAddingObject:entry];
-    }
-  }
-  NSSortDescriptor* sort = [NSSortDescriptor sortDescriptorWithKey:@"value" ascending:NO];
-  NSArray* sortedLabels =
-      [candidateLabels sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]];
+- (void)setPredictionValues:(std::vector<std::pair<float, std::string>>)newValues {
 
   const float leftMargin = 10.0f;
   const float topMargin = 10.0f;
@@ -423,10 +386,9 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
   [self removeAllLabelLayers];
 
   int labelCount = 0;
-  for (NSDictionary* entry in sortedLabels) {
-    NSString* label = [entry objectForKey:@"label"];
-    NSNumber* valueObject = [entry objectForKey:@"value"];
-    const float value = [valueObject floatValue];
+  for  (const auto& item : newValues) {
+    std::string label = item.second;
+    const float value = item.first;
     const float originY = topMargin + ((labelHeight + labelMarginY) * labelCount);
     const int valuePercentage = (int)roundf(value * 100.0f);
 
@@ -442,7 +404,9 @@ static void GetTopN(const uint8_t* prediction, const int prediction_size, const 
 
     const float labelOriginX = (leftMargin + valueWidth + labelMarginX);
 
-    [self addLabelLayerWithText:[label capitalizedString]
+    NSString *nsLabel = [NSString stringWithCString:label.c_str()
+                                           encoding:[NSString defaultCStringEncoding]];
+    [self addLabelLayerWithText:[nsLabel capitalizedString]
                         originX:labelOriginX
                         originY:originY
                           width:labelWidth
