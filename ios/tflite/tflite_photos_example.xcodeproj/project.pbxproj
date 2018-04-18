@@ -15,6 +15,7 @@
 		1CDB2D4A1ED3A9CD007929E9 /* CameraExampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CDB2D451ED3A9CD007929E9 /* CameraExampleViewController.mm */; };
 		1CDB2D4E1ED3AA35007929E9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1CDB2D4D1ED3AA35007929E9 /* Info.plist */; };
 		2E12E3C82087CB8600FD9D4A /* graph.lite in Resources */ = {isa = PBXBuildFile; fileRef = 2E12E3C72087CB8600FD9D4A /* graph.lite */; };
+		2E92D8912088011F005F343A /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E92D8902088011F005F343A /* AppIcon.xcassets */; };
 		2ED6BE3A207C23E000D3BF6F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2ED6BE39207C23E000D3BF6F /* Photos.framework */; };
 		54DC6C3C5F734F3A58069F0C /* libPods-tflite_camera_example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BA8BF92C84895BFE59D8236 /* libPods-tflite_camera_example.a */; };
 		AC1F82661FBA3CBD0052BA77 /* labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = AC1F82641FBA3CBD0052BA77 /* labels.txt */; };
@@ -35,6 +36,7 @@
 		1CDB2D451ED3A9CD007929E9 /* CameraExampleViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraExampleViewController.mm; sourceTree = "<group>"; };
 		1CDB2D4D1ED3AA35007929E9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2E12E3C72087CB8600FD9D4A /* graph.lite */ = {isa = PBXFileReference; lastKnownFileType = file; path = graph.lite; sourceTree = "<group>"; };
+		2E92D8902088011F005F343A /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		2ED6BE39207C23E000D3BF6F /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		3BA8BF92C84895BFE59D8236 /* libPods-tflite_camera_example.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tflite_camera_example.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BC5BE4BBD09374D3E98F082 /* Pods-tflite_camera_example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tflite_camera_example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tflite_camera_example/Pods-tflite_camera_example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 		591157921CF4011C00C31E3A = {
 			isa = PBXGroup;
 			children = (
+				2E92D8902088011F005F343A /* AppIcon.xcassets */,
 				1C99111B1ED3B0E600A6BFB9 /* MainStoryboard_iPhone.storyboard */,
 				1C3C9DCA1ED3AB4200B8B5FA /* main.mm */,
 				1CDB2D4D1ED3AA35007929E9 /* Info.plist */,
@@ -175,6 +178,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E92D8912088011F005F343A /* AppIcon.xcassets in Resources */,
 				2E12E3C82087CB8600FD9D4A /* graph.lite in Resources */,
 				1C99111C1ED3B0E600A6BFB9 /* MainStoryboard_iPhone.storyboard in Resources */,
 				1CDB2D4E1ED3AA35007929E9 /* Info.plist in Resources */,
