@@ -24,7 +24,7 @@
 		1C0D73481ECCC41B008C1DAB /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		1C0D734A1ECCC460008C1DAB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		1C3C9DCA1ED3AB4200B8B5FA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
-		1C564C0D1ED3A92E00087306 /* tflite_camera_example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tflite_camera_example.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1C564C0D1ED3A92E00087306 /* tflite_photos_example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = tflite_photos_example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1C99111B1ED3B0E600A6BFB9 /* MainStoryboard_iPhone.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard_iPhone.storyboard; sourceTree = "<group>"; };
 		1CA45FFE1ECCC356002FA6A4 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		1CA5EB921ED3ABFB00247A34 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
@@ -100,7 +100,7 @@
 		5911579C1CF4011C00C31E3A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1C564C0D1ED3A92E00087306 /* tflite_camera_example.app */,
+				1C564C0D1ED3A92E00087306 /* tflite_photos_example.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,9 +117,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1C564C0C1ED3A92E00087306 /* tflite_camera_example */ = {
+		1C564C0C1ED3A92E00087306 /* tflite_photos_example */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1C564C351ED3A92E00087306 /* Build configuration list for PBXNativeTarget "tflite_camera_example" */;
+			buildConfigurationList = 1C564C351ED3A92E00087306 /* Build configuration list for PBXNativeTarget "tflite_photos_example" */;
 			buildPhases = (
 				66DAEAAEE9EF6550C3A061E0 /* [CP] Check Pods Manifest.lock */,
 				1C564C091ED3A92E00087306 /* Sources */,
@@ -130,9 +130,9 @@
 			);
 			dependencies = (
 			);
-			name = tflite_camera_example;
+			name = tflite_photos_example;
 			productName = tflite_camera_example;
-			productReference = 1C564C0D1ED3A92E00087306 /* tflite_camera_example.app */;
+			productReference = 1C564C0D1ED3A92E00087306 /* tflite_photos_example.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -152,7 +152,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 591157961CF4011C00C31E3A /* Build configuration list for PBXProject "tflite_camera_example" */;
+			buildConfigurationList = 591157961CF4011C00C31E3A /* Build configuration list for PBXProject "tflite_photos_example" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -165,7 +165,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1C564C0C1ED3A92E00087306 /* tflite_camera_example */,
+				1C564C0C1ED3A92E00087306 /* tflite_photos_example */,
 			);
 		};
 /* End PBXProject section */
@@ -231,7 +231,7 @@
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pf.tf-camera-example";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pf.tf-photos-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -251,7 +251,7 @@
 				INFOPLIST_FILE = Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pf.tf-camera-example";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pf.tf-photos-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 3.0;
@@ -361,7 +361,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1C564C351ED3A92E00087306 /* Build configuration list for PBXNativeTarget "tflite_camera_example" */ = {
+		1C564C351ED3A92E00087306 /* Build configuration list for PBXNativeTarget "tflite_photos_example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1C564C361ED3A92E00087306 /* Debug */,
@@ -370,7 +370,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		591157961CF4011C00C31E3A /* Build configuration list for PBXProject "tflite_camera_example" */ = {
+		591157961CF4011C00C31E3A /* Build configuration list for PBXProject "tflite_photos_example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				591157B01CF4011D00C31E3A /* Debug */,
