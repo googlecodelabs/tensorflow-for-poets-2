@@ -250,13 +250,13 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
 }
 
 - (void)inputImageToModel:(image_data)image{
-  int input = interpreter->inputs()[0];
+  float* out = interpreter->typed_input_tensor<float>(0);
   
   const float input_mean = 127.5f;
   const float input_std = 127.5f;
   assert(image.channels >= wanted_input_channels);
   uint8_t* in = image.data.data();
-  float* out = interpreter->typed_tensor<float>(input);
+
   for (int y = 0; y < wanted_input_height; ++y) {
     const int in_y = (y * image.height) / wanted_input_height;
     uint8_t* in_row = in + (in_y * image.width * image.channels);
