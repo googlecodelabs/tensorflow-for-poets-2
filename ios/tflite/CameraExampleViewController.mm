@@ -146,7 +146,8 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
   
   if (input_image != nil){
     image_data image = [self CGImageToPixels:input_image.CGImage];
-    [self runModelSimple:image];
+    [self inputImageToModel:image];
+    [self runModel];
   }
 }
 
@@ -248,7 +249,7 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
     [self UpdatePhoto];
 }
 
-- (void)runModelSimple:(image_data)image{
+- (void)inputImageToModel:(image_data)image{
   int input = interpreter->inputs()[0];
   
   const float input_mean = 127.5f;
@@ -269,11 +270,9 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
       }
     }
   }
-  
-  [self _execModel];
 }
 
-- (void)_execModel {
+- (void)runModel {
   double startTimestamp = [[NSDate new] timeIntervalSince1970];
   if (interpreter->Invoke() != kTfLiteOk) {
     LOG(FATAL) << "Failed to invoke!";
