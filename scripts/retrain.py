@@ -148,7 +148,7 @@ def create_image_lists(image_dir, testing_percentage, validation_percentage):
   sub_dirs = sorted(item for item in sub_dirs
                     if gfile.IsDirectory(item))
   for sub_dir in sub_dirs:
-    extensions = ['jpg', 'jpeg', 'JPG', 'JPEG']
+    extensions = ['jpg', 'jpeg', 'JPG', 'JPEG','png','PNG','BMP','bmp']
     file_list = []
     dir_name = os.path.basename(sub_dir)
     if dir_name == image_dir:
