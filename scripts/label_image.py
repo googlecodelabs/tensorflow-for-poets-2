@@ -132,6 +132,6 @@ if __name__ == "__main__":
   labels = load_labels(label_file)
 
   print('\nEvaluation time (1-image): {:.3f}s\n'.format(end-start))
-
+  template = "{} (score={:0.5f})"
   for i in top_k:
-    print(labels[i], results[i])
+    print(template.format(labels[i], results[i]))
