@@ -37,7 +37,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
 
     lintOptions {
         abortOnError false
@@ -62,7 +62,7 @@ android {
             }
 
             dependencies {
-                compile 'org.tensorflow:tensorflow-android:1.2.0-preview'
+                compile 'org.tensorflow:tensorflow-android:+'
             }
 
         }
