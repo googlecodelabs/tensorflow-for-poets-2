@@ -1,0 +1,14 @@
+# Android sdk and ndk
+android_sdk_repository(name="androidsdk")
+android_ndk_repository(name="androidndk")
+
+# for maven_aar
+load("@bazel_tools//tools/build_defs/repo:maven_rules.bzl", "maven_aar")
+
+# https://jcenter.bintray.com/org/tensorflow/tensorflow-lite/0.1.7/tensorflow-lite-0.1.7.pom
+maven_aar(
+    name = "tensorflow_android",
+    artifact = "org.tensorflow:tensorflow-android:1.8.0",
+)
+
+
