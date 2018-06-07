@@ -741,7 +741,7 @@ def add_final_training_ops(class_count, final_tensor_name, bottleneck_tensor,
   weights, and then sets up all the gradients for the backward pass.
 
   The set up for the softmax and fully-connected layers is based on:
-  https://www.tensorflow.org/versions/master/tutorials/mnist/beginners/index.html
+  https://www.tensorflow.org/versions/r1.0/get_started/mnist/beginners
 
   Args:
     class_count: Integer of how many categories of things we're trying to
