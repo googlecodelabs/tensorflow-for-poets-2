@@ -6,7 +6,7 @@ assert file(project.ext.ASSET_DIR + "/graph.lite").exists()
 assert file(project.ext.ASSET_DIR + "/labels.txt").exists()
 
 android {
-    compileSdkVersion  27
+    compileSdkVersion  26
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "android.example.com.tflitecamerademo"
@@ -39,13 +39,17 @@ android {
 repositories {
     maven {
         url 'https://google.bintray.com/tensorflow'
+         'https://maven.google.com'
     }
     google()
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.0.0+'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.0.0+'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation 'com.android.support:design:27.0.0+'
+    implementation 'com.android.support:design:26.0.0+'
+    implementation project(':tensorflow-lite-1.10.0')
+    implementation 'com.android.support:support-v13:26.0.0'
+    implementation 'com.android.support:support-v4:26.0.0'
 }
