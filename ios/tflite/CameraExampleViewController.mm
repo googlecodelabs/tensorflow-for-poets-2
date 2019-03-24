@@ -340,10 +340,6 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
   [self attachPreviewLayer];
 }
 
-- (void)viewDidUnload {
-  [super viewDidUnload];
-}
-
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
 }
@@ -360,8 +356,9 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
   [super viewDidDisappear:animated];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-  return (interfaceOrientation == UIInterfaceOrientationPortrait);
+- (BOOL)shouldAutorotate {
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (BOOL)prefersStatusBarHidden {
