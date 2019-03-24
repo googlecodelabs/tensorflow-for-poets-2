@@ -13,7 +13,6 @@
 		1CB47D491ED3AD1700DF7666 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CB47D481ED3AD1700DF7666 /* AVFoundation.framework */; };
 		1CDB2D491ED3A9CD007929E9 /* CameraExampleAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CDB2D431ED3A9CD007929E9 /* CameraExampleAppDelegate.m */; };
 		1CDB2D4A1ED3A9CD007929E9 /* CameraExampleViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1CDB2D451ED3A9CD007929E9 /* CameraExampleViewController.mm */; };
-		1CDB2D4E1ED3AA35007929E9 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1CDB2D4D1ED3AA35007929E9 /* Info.plist */; };
 		2E12E3C82087CB8600FD9D4A /* graph.lite in Resources */ = {isa = PBXBuildFile; fileRef = 2E12E3C72087CB8600FD9D4A /* graph.lite */; };
 		2E92D8912088011F005F343A /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E92D8902088011F005F343A /* AppIcon.xcassets */; };
 		2ED6BE3A207C23E000D3BF6F /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2ED6BE39207C23E000D3BF6F /* Photos.framework */; };
@@ -187,7 +186,6 @@
 				2E92D8912088011F005F343A /* AppIcon.xcassets in Resources */,
 				2E12E3C82087CB8600FD9D4A /* graph.lite in Resources */,
 				1C99111C1ED3B0E600A6BFB9 /* MainStoryboard_iPhone.storyboard in Resources */,
-				1CDB2D4E1ED3AA35007929E9 /* Info.plist in Resources */,
 				AC1F82661FBA3CBD0052BA77 /* labels.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
