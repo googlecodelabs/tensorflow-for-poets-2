@@ -8,3 +8,4 @@ local.properties
 android.iml
 .gradle/
 android/assets/*
+build/*
