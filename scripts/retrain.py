@@ -942,7 +942,7 @@ def add_jpeg_decoding(input_width, input_height, input_depth, input_mean,
 
   Args:
     input_width: Desired width of the image fed into the recognizer graph.
-    input_height: Desired width of the image fed into the recognizer graph.
+    input_height: Desired height of the image fed into the recognizer graph.
     input_depth: Desired channels of the image fed into the recognizer graph.
     input_mean: Pixel value that should be zero in the image for the graph.
     input_std: How much to divide the pixel values by before recognition.
