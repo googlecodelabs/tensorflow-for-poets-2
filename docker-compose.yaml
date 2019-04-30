@@ -1,0 +1,10 @@
+version: '3'
+services:
+  train:
+    image: tensorflow/tensorflow
+    volumes:
+    - "$PWD:/work"
+    ports:
+    - "6006:6006"
+    working_dir: /work
+    command: /bin/bash
