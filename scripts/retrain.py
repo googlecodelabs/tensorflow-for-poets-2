@@ -1140,7 +1140,7 @@ def main(_):
       f.write('\n'.join(image_lists.keys()) + '\n')
 
 
-if __name__ == '__main__':
+def init_parser():
   parser = argparse.ArgumentParser()
   parser.add_argument(
       '--image_dir',
@@ -1322,5 +1322,18 @@ if __name__ == '__main__':
       takes 128x128 images. See https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html
       for more information on Mobilenet.\
       """)
+  return parser
+
+
+def run_with_args(**kwargs):
+  exec_args = sum([['--' + k, str(v)] for k, v in kwargs.items()], [])
+  parser = init_parser()
+  global FLAGS
+  FLAGS = parser.parse_args(exec_args)
+  main(None)
+
+
+if __name__ == '__main__':
+  parser = init_parser()
   FLAGS, unparsed = parser.parse_known_args()
   tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
