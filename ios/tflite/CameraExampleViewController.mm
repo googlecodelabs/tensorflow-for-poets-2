@@ -23,10 +23,10 @@
 #include <iostream>
 #include <queue>
 
-#include "tensorflow/contrib/lite/kernels/register.h"
-#include "tensorflow/contrib/lite/model.h"
-#include "tensorflow/contrib/lite/string_util.h"
-#include "tensorflow/contrib/lite/mutable_op_resolver.h"
+#include "tensorflow/lite/kernels/register.h"
+#include "tensorflow/lite/model.h"
+#include "tensorflow/lite/string_util.h"
+#include "tensorflow/lite/mutable_op_resolver.h"
 
 #define LOG(x) std::cerr
 
@@ -340,10 +340,6 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
   [self attachPreviewLayer];
 }
 
-- (void)viewDidUnload {
-  [super viewDidUnload];
-}
-
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
 }
@@ -360,8 +356,9 @@ static void GetTopN(const float* prediction, const int prediction_size, const in
   [super viewDidDisappear:animated];
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-  return (interfaceOrientation == UIInterfaceOrientationPortrait);
+- (BOOL)shouldAutorotate {
+    UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 - (BOOL)prefersStatusBarHidden {
