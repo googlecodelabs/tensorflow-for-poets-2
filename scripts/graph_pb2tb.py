@@ -33,6 +33,7 @@ def graph_to_tensorboard(graph, out_dir):
   with tf.Session():
     train_writer = tf.summary.FileWriter(out_dir)
     train_writer.add_graph(graph)
+    train_writer.close()
   
   
 def main(out_dir, graph_pb_path):
