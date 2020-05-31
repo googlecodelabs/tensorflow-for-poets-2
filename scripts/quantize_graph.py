@@ -31,6 +31,7 @@ import os
 import collections
 import re
 import numpy as np
+import tensorflow as tf
 
 from tensorflow.core.framework import attr_value_pb2
 from tensorflow.core.framework import graph_pb2
@@ -584,7 +585,7 @@ class GraphRewriter(object):
       quantize_input = False
       if current_node.op in ("MatMul", "Conv2D", "BiasAdd", "MaxPool",
                              "AvgPool", "Relu", "Relu6",
-                             "BatchNormWithGlobalNormalization"):
+                             tf.nn.batch_normalization()):
         quantize_input = True
       elif current_node.op == "Concat" and i > 0:
         quantize_input = (
@@ -616,7 +617,7 @@ class GraphRewriter(object):
     elif (current_node.op == "Concat" and
           dtypes.as_dtype(current_node.attr["T"].type) == dtypes.float32):
       self.eightbitize_concat_node(current_node)
-    elif current_node.op == "BatchNormWithGlobalNormalization":
+    elif current_node.op == tf.nn.batch_normalization():
       self.eightbitize_batch_norm_node(current_node)
     elif (current_node.op == "Reshape" and
           dtypes.as_dtype(current_node.attr["T"].type) == dtypes.float32):
@@ -1044,7 +1045,7 @@ class GraphRewriter(object):
         self.eightbitize_input_to_node(namespace_prefix, original_gamma_name,
                                        reshape_dims_name, reduction_dims_name))
     quantized_batch_norm_node = create_node(
-        "QuantizedBatchNormWithGlobalNormalization", quantized_batch_norm_name,
+        tf.nn.batch_normalization(), quantized_batch_norm_name,
         [
             quantize_input_name, min_input_name, max_input_name,
             quantize_mean_name, min_mean_name, max_mean_name,
@@ -1187,7 +1188,7 @@ class GraphRewriter(object):
   def remove_dead_nodes(self, output_names):
     """Removes nodes that are no longer needed for inference from the graph."""
     old_output_graph = self.output_graph
-    self.output_graph = graph_util.extract_sub_graph(old_output_graph,
+    self.output_graph = tf.compat.v1.graph_util.extract_sub_graph(old_output_graph,
                                                      output_names)
 
   def quantize_weights(self, input_graph, quantization_mode):

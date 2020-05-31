@@ -25,7 +25,7 @@ import tensorflow as tf
 def load_graph(file_name):
   with open(file_name,'rb') as f:
     content = f.read()
-  graph_def = tf.GraphDef()
+  graph_def = tf.compat.v1.GraphDef()
   graph_def.ParseFromString(content)
   with tf.Graph().as_default() as graph:
     tf.import_graph_def(graph_def, name='')

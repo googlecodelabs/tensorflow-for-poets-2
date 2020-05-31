@@ -31,7 +31,7 @@ from scripts.count_ops import load_graph
 
 def evaluate_graph(graph_file_name):
     with load_graph(graph_file_name).as_default() as graph:
-        ground_truth_input = tf.placeholder(
+        ground_truth_input = tf.compat.v1.placeholder(
             tf.float32, [None, 5], name='GroundTruthInput')
         
         image_buffer_input = graph.get_tensor_by_name('input:0')
@@ -39,8 +39,8 @@ def evaluate_graph(graph_file_name):
         accuracy, _ = retrain.add_evaluation_step(final_tensor, ground_truth_input)
         
         logits = graph.get_tensor_by_name("final_training_ops/Wx_plus_b/add:0")
-        xent = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-            labels = ground_truth_input,
+        xent = tf.reduce_mean(input_tensor=tf.nn.softmax_cross_entropy_with_logits(
+            labels = tf.stop_gradient( ground_truth_input),
             logits = logits))
         
     image_dir = 'tf_files/flower_photos'
@@ -68,7 +68,7 @@ def evaluate_graph(graph_file_name):
     
     accuracies = []
     xents = []
-    with tf.Session(graph=graph) as sess:
+    with tf.compat.v1.Session(graph=graph) as sess:
         for filename, ground_truth in zip(filenames, ground_truths):    
             image = Image.open(filename).resize((224,224),Image.ANTIALIAS)
             image = np.array(image, dtype=np.float32)[None,...]
