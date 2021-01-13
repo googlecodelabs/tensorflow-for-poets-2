@@ -23,6 +23,7 @@ import time
 
 import numpy as np
 import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
 
 def load_graph(model_file):
   graph = tf.Graph()
