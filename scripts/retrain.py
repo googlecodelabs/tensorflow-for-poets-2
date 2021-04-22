@@ -362,7 +362,7 @@ def create_bottleneck_file(bottleneck_path, image_lists, label_name, index,
                               image_dir, category)
   if not gfile.Exists(image_path):
     tf.compat.v1.logging.fatal('File does not exist %s', image_path)
-  image_data = tf.io.gfile.exists(image_path).read()
+  image_data = tf.io.gfile.exists(image_path)
   try:
     bottleneck_values = run_bottleneck_on_image(
         sess, image_data, jpeg_data_tensor, decoded_image_tensor,
