@@ -362,14 +362,13 @@ def create_bottleneck_file(bottleneck_path, image_lists, label_name, index,
                               image_dir, category)
   if not gfile.Exists(image_path):
     tf.compat.v1.logging.fatal('File does not exist %s', image_path)
-  image_data = tf.io.gfile.exists(image_path)
+  image_data = gfile.FastGFile(image_path, 'rb').read()
   try:
     bottleneck_values = run_bottleneck_on_image(
         sess, image_data, jpeg_data_tensor, decoded_image_tensor,
         resized_input_tensor, bottleneck_tensor)
   except Exception as e:
-    raise RuntimeError('Error during processing file %s (%s)' % (image_path,
-                                                                 str(e)))
+    raise RuntimeError('Error during processing file %s (%s)' % (image_path, str(e)))
   bottleneck_string = ','.join(str(x) for x in bottleneck_values)
   with open(bottleneck_path, 'w') as bottleneck_file:
     bottleneck_file.write(bottleneck_string)
@@ -985,6 +984,7 @@ def main(_):
   # Look at the folder structure, and create lists of all the images.
   image_lists = create_image_lists(FLAGS.image_dir, FLAGS.testing_percentage,
                                    FLAGS.validation_percentage)
+  print(image_lists)
   class_count = len(image_lists.keys())
   if class_count == 0:
     tf.compat.v1.logging.error('No valid folders of images found at ' + FLAGS.image_dir)
