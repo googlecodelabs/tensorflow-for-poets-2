@@ -22,7 +22,7 @@ import tensorflow as tf
 def load_graph(graph_pb_path):
   with open(graph_pb_path,'rb') as f:
     content = f.read()
-  graph_def = tf.GraphDef()
+  graph_def = tf.compat.v1.GraphDef()
   graph_def.ParseFromString(content)
   with tf.Graph().as_default() as graph:
     tf.import_graph_def(graph_def, name='')
@@ -30,8 +30,8 @@ def load_graph(graph_pb_path):
 
   
 def graph_to_tensorboard(graph, out_dir):
-  with tf.Session():
-    train_writer = tf.summary.FileWriter(out_dir)
+  with tf.compat.v1.Session():
+    train_writer = tf.compat.v1.summary.FileWriter(out_dir)
     train_writer.add_graph(graph)
   
   
